@@ -72,48 +72,88 @@ In the proposed setup, records older than 3 months will be archived to Azure Blo
 ### 2. Illustrative Architecture Diagram
 
 ```plaintext
-+--------------------------------------------------------------+
-|                          API Layer                           |
-|                 (Azure API Management)                       |
-|                       +-------------+                       |
-|                       |  Frontend   |                       |
-|                       | (Web/App)   |                       |
-|                       +-------------+                       |
-+--------------------------------------------------------------+
-                           |               |                  
-                           |               |                  
-                           |               |                  
-                           |               |                  
-                           |               |                  
-               +-----------+               +------------+      
-               |                                               |  
-               |                                               |  
-               |                                               |  
-        +------+-------+                            +---------+---------+  
-        |  Azure       |                            |  Azure Queue      |
-        |  Functions   |                            |  Storage          |
-        |  (Data       |                            |  (Request Buffer) |
-        |  Processing) |                            +-------------------+
-        +------+-------+                                            |
-               |                                                    |
-               |                                                    |
-               |                                                    |
-        +------+-------+                                 +----------+---------+     
-        |  Azure       |                                 |  Azure Durable     |
-        |  Cosmos DB   |                                 |  Functions         |
-        |  (Active     |                                 |  (Workflow         |
-        |  Records)    |                                 |  Management)       |
-        +--------------+                                 +-------------------+
-                                                           |
-                                                           |
-                                                           |
-                                                     +-----+-----+
-                                                     |  Azure Blob  |
-                                                     |  Storage     |
-                                                     | (Archived    |
-                                                     |  Records)    |
-                                                     +--------------+
++-----------------------------------------------------+
+|                     API Layer                       |
+|                  (API Management)                   |
+|                      +---------------+              |
+|                      |   Frontend    |              |
+|                      | (Web/App UI)  |              |
+|                      +---------------+              |
++-----------------------------------------------------+
+                              |
+                              |
+                              v
++-----------------------------+-----------------------------+
+|                         Azure Functions                   |
+|                   (Data Processing and Workflows)         |
++-----------------------------+-----------------------------+
+|                             |                             |
+|                             |                             |
+|                             |                             |
+|                             |                             |
+|  +-------------------+      |      +-------------------+  |
+|  | Azure Cosmos DB   |      |      |  Azure Blob       |  |
+|  | (Active Records)  |      |      |  Storage          |  |
+|  |                   |      |      | (Archived Records)|  |
+|  +-------------------+      |      +-------------------+  |
+|                             |                             |
+|                             |                             |
+|                             v                             |
+|                  +-------------------+                    |
+|                  | Azure Queue       |                    |
+|                  | Storage           |                    |
+|                  | (Request Buffer)  |                    |
+|                  +-------------------+                    |
+|                             |                             |
+|                             v                             |
+|                  +-------------------+                    |
+|                  |  Azure Application |                   |
+|                  |  Insights          |                   |
+|                  +-------------------+                    |
+|                             |                             |
+|                             v                             |
+|                  +-------------------+                    |
+|                  |  Azure Key Vault   |                   |
+|                  |(Secrets Management)|                   |
+|                  +-------------------+                    |
+|                             |                             |
+|                             v                             |
+|                  +-------------------+                    |
+|                  |  Azure Logic Apps   |                  |
+|                  |(Workflow Automation)|                  |
+|                  +-------------------+                    |
++-----------------------------------------------------+
 ```
+
+### Key Components Explained
+
+1. **API Layer (API Management)**:
+   - Acts as the entry point for clients to interact with the system, maintaining existing contracts and providing a secure interface.
+
+2. **Frontend (Web/App UI)**:
+   - The user interface through which users access and manage billing records.
+
+3. **Azure Functions**:
+   - Handles the processing of requests, including reading from the active records and managing workflows for data archival.
+
+4. **Azure Cosmos DB**:
+   - Stores active billing records (those less than three months old) for quick and efficient access.
+
+5. **Azure Blob Storage**:
+   - Used for archiving older billing records (those older than three months), providing a cost-effective storage solution.
+
+6. **Azure Queue Storage**:
+   - Buffers incoming requests to handle spikes in demand and ensure that processing is decoupled from user interactions.
+
+7. **Azure Application Insights**:
+   - Monitors application performance and usage, helping to detect issues and track key metrics.
+
+8. **Azure Key Vault**:
+   - Manages and protects sensitive information such as API keys and connection strings, ensuring that access is secure.
+
+9. **Azure Logic Apps**:
+   - Automates workflows for data processing and integration, facilitating the archival and retrieval processes.
+
 
 ### Key Components Explained
 
