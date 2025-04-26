@@ -31,7 +31,7 @@ This document outlines a robust solution for dynamically managing the copying of
 1. We have 5000 RU/s available, with almost 50% used on a day-to-day basis.
 2. To process a record of 300 KB, it will consume approximately 300 RU.
 
-### Specific Challenges
+### Specific Challenges that can be encountered
 1. How do we migrate the data from Cosmos DB to the storage account?
 2. How do we validate that the files are not corrupted?
 3. How much time will it take?
@@ -40,7 +40,7 @@ This document outlines a robust solution for dynamically managing the copying of
 6. How do we monitor the risk that, on the day we are planning to migrate data, the business is experiencing a lot of read-heavy activity?
 7. What other things can go wrong?
 
-### Additional Information
+### Additional Information (Assumed)
 - The Azure Cosmos DB used is **Azure Cosmos DB for NoSQL**.
 - The data in the storage account is copied in **Parquet format** to ensure lower latencies.
 
@@ -48,6 +48,7 @@ This document outlines a robust solution for dynamically managing the copying of
 
 1. **Event-Driven RU Monitoring**:
    - Set up an Azure Monitor alert that triggers an Azure Function when RU usage exceeds a specified threshold (e.g., 80%).
+   - Reference the document named "MonitorRUUsage.md" for exact configuration.
 
 2. **Trigger ADF Pipeline**:
    - If RU usage is below the threshold, the Azure Function triggers an ADF pipeline to copy data from Azure Cosmos DB to Azure Blob Storage.
