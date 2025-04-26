@@ -48,7 +48,7 @@ This document outlines a robust solution for dynamically managing the copying of
 
 1. **Event-Driven RU Monitoring**:
    - Set up an Azure Monitor alert that triggers an Azure Function when RU usage exceeds a specified threshold (e.g., 80%).
-   - Reference the document MonitorRUUsage.md for exact configuration.
+   - Reference the document [MonitorRUUsage.md](https://github.com/mukeshmistri/Cost-Optimization-Challenge/blob/791c281a8b437de4afb498d5353dbc064302d13c/MonitorRUUsage.md) for exact configuration.
 
 2. **Trigger ADF Pipeline**:
    - If RU usage is below the threshold, the Azure Function triggers an ADF pipeline to copy data from Azure Cosmos DB to Azure Blob Storage.
